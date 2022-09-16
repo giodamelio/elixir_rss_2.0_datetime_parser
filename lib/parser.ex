@@ -14,6 +14,7 @@ defmodule Rss20DatetimeParser.Parser do
   day =
     choice(days |> Enum.map(&string/1))
     |> label("day of the week (#{Enum.join(days, " | ")})")
+    |> unwrap_and_tag(:day)
 
   months = [
     "Jan",
@@ -43,6 +44,7 @@ defmodule Rss20DatetimeParser.Parser do
     |> concat(month)
     |> ignore(string(" "))
     |> concat(two_digits)
+    |> tag(:date)
 
   # Confusingly named, but I am sticking with the names as defined in RFC822
   hour =
@@ -80,6 +82,7 @@ defmodule Rss20DatetimeParser.Parser do
     hour
     |> ignore(string(" "))
     |> concat(zone)
+    |> tag(:time)
 
   datetime =
     optional(
@@ -99,5 +102,5 @@ defmodule Rss20DatetimeParser.Parser do
   defparsec(:offset, offset)
   defparsec(:zone, zone)
   defparsec(:time, time)
-  defparsec(:datetime, datetime)
+  defparsec(:datetime, datetime, export_metadata: true)
 end

@@ -6,13 +6,13 @@ defmodule Rss20DatetimeParser.ParserTest do
 
   describe "parse a day" do
     test "parse a day of the week" do
-      assert Parser.day("Mon") == {:ok, ["Mon"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Tue") == {:ok, ["Tue"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Wed") == {:ok, ["Wed"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Thu") == {:ok, ["Thu"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Fri") == {:ok, ["Fri"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Sat") == {:ok, ["Sat"], "", %{}, {1, 0}, 3}
-      assert Parser.day("Sun") == {:ok, ["Sun"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Mon") == {:ok, [day: "Mon"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Tue") == {:ok, [day: "Tue"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Wed") == {:ok, [day: "Wed"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Thu") == {:ok, [day: "Thu"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Fri") == {:ok, [day: "Fri"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Sat") == {:ok, [day: "Sat"], "", %{}, {1, 0}, 3}
+      assert Parser.day("Sun") == {:ok, [day: "Sun"], "", %{}, {1, 0}, 3}
     end
 
     test "errors upon unexpected day" do
@@ -70,7 +70,7 @@ defmodule Rss20DatetimeParser.ParserTest do
 
   describe "parse a date" do
     test "parse a valid date" do
-      assert Parser.date("20 Sep 96") == {:ok, ["20", "Sep", "96"], "", %{}, {1, 0}, 9}
+      assert Parser.date("20 Sep 96") == {:ok, [date: ["20", "Sep", "96"]], "", %{}, {1, 0}, 9}
     end
   end
 
@@ -122,18 +122,26 @@ defmodule Rss20DatetimeParser.ParserTest do
 
   describe "parse a time" do
     test "parse a valid time" do
-      assert Parser.time("01:01:01 UT") == {:ok, ["01", "01", "01", "UT"], "", %{}, {1, 0}, 11}
-      assert Parser.time("02:02:02 EST") == {:ok, ["02", "02", "02", "EST"], "", %{}, {1, 0}, 12}
+      assert Parser.time("01:01:01 UT") ==
+               {:ok, [time: ["01", "01", "01", "UT"]], "", %{}, {1, 0}, 11}
+
+      assert Parser.time("02:02:02 EST") ==
+               {:ok, [time: ["02", "02", "02", "EST"]], "", %{}, {1, 0}, 12}
     end
   end
 
   describe "parse datetimes" do
     test "parse a valid datetime" do
       assert Parser.datetime("Mon, 12 Sep 82 17:53 EDT") ==
-               {:ok, ["Mon", "12", "Sep", "82", "17", "53", "EDT"], "", %{}, {1, 0}, 24}
+               {:ok, [day: "Mon", date: ["12", "Sep", "82"], time: ["17", "53", "EDT"]], "", %{},
+                {1, 0}, 24}
 
       assert Parser.datetime("12 Sep 82 17:53 EDT") ==
-               {:ok, ["12", "Sep", "82", "17", "53", "EDT"], "", %{}, {1, 0}, 19}
+               {:ok, [date: ["12", "Sep", "82"], time: ["17", "53", "EDT"]], "", %{}, {1, 0}, 19}
+
+      assert Parser.datetime("12 Sep 82 17:53:00 EDT") ==
+               {:ok, [date: ["12", "Sep", "82"], time: ["17", "53", "00", "EDT"]], "", %{},
+                {1, 0}, 22}
     end
   end
 end
